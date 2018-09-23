@@ -4,3 +4,7 @@ version = "0.1.0"
 authors = ["setup"]
 
 [dependencies]
+libusb = "0.3"
+log = "0.4.3"
+uinput = "0.1.3"
+
