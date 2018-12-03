@@ -43,7 +43,7 @@ impl<'a> G13Device<'a> {
                 0,
                 &usb_data,
                 Duration::from_secs(1)
-        ).unwrap();
+        ).unwrap_or(0);
     }
 
     pub fn set_led_color(&self, red: u8, green: u8, blue: u8) {
@@ -55,7 +55,22 @@ impl<'a> G13Device<'a> {
                 0,
                 &usb_data,
                 Duration::from_secs(1)
-        ).unwrap();
+        ).unwrap_or(0);
+    }
+
+    pub fn read_keys(&self) -> Result<(), libusb::Error> {
+        let mut usb_buffer = [0 as u8; 8];
+
+        match self.handle.read_interrupt(0x82,
+            &mut usb_buffer,
+            Duration::from_millis(100)
+        ) {
+            Ok(_) => Ok(()),
+            Err(err) => match err {
+                libusb::Error::Timeout => Ok(()),
+                _ => Err(err)
+            }
+        }
     }
 }
 
