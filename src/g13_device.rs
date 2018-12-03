@@ -61,12 +61,13 @@ impl<'a> G13Device<'a> {
     pub fn read_keys(&self) -> Result<(), libusb::Error> {
         let mut usb_buffer = [0 as u8; 8];
 
-        match self.handle.read_interrupt(0x82,
+        match self.handle.read_interrupt(libusb::request_type(libusb::Direction::In, libusb::RequestType::Standard, libusb::Recipient::Device) | 1,
             &mut usb_buffer,
             Duration::from_millis(100)
         ) {
             Ok(_) => Ok(()),
             Err(err) => match err {
+                // ignore timeout errors
                 libusb::Error::Timeout => Ok(()),
                 _ => Err(err)
             }

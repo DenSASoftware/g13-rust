@@ -22,14 +22,12 @@ fn main() {
         let mine = g13s.pop().unwrap();
 
         loop {
-            for i in 0..255 {
-                mine.set_led_color(0, i, 255 - i);
-                thread::sleep(Duration::from_millis(10));
+            match mine.read_keys() {
+                Ok(_) => info!("Read keys correctly"),
+                Err(error) => error!("An error occurred: {}", error)
             }
-            for i in (0..254).rev() {
-                mine.set_led_color(0, i, 255 -i);
-                thread::sleep(Duration::from_millis(10));
-            }
+
+            thread::sleep(Duration::from_millis(100));
         }
     }
 }
