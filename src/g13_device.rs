@@ -1,3 +1,5 @@
+use constants::*;
+
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::time::Duration;
 
@@ -37,34 +39,19 @@ impl<'a> G13Device<'a> {
     pub fn set_mode_leds(&self, leds: i32) {
         let usb_data = [5, leds as u8, 0, 0, 0];
 
-        self.handle.write_control(libusb::request_type(libusb::Direction::Out, libusb::RequestType::Class, libusb::Recipient::Interface),
-                9,
-                0x305,
-                0,
-                &usb_data,
-                Duration::from_secs(1)
-        ).unwrap_or(0);
+        self.handle.write_control(G13_LED_MODE_ENDPOINT, 9, 0x305, 0, &usb_data, Duration::from_secs(1)).unwrap_or(0);
     }
 
     pub fn set_led_color(&self, red: u8, green: u8, blue: u8) {
         let usb_data = [5, red, green, blue, 0];
 
-        self.handle.write_control(libusb::request_type(libusb::Direction::Out, libusb::RequestType::Class, libusb::Recipient::Interface),
-                9,
-                0x307,
-                0,
-                &usb_data,
-                Duration::from_secs(1)
-        ).unwrap_or(0);
+        self.handle.write_control(G13_LED_ENDPOINT, 9, 0x307, 0, &usb_data, Duration::from_secs(1)).unwrap_or(0);
     }
 
     pub fn read_keys(&self) -> Result<(), libusb::Error> {
         let mut usb_buffer = [0 as u8; 8];
 
-        match self.handle.read_interrupt(libusb::request_type(libusb::Direction::In, libusb::RequestType::Standard, libusb::Recipient::Device) | 1,
-            &mut usb_buffer,
-            Duration::from_millis(100)
-        ) {
+        match self.handle.read_interrupt(G13_KEYS_ENDPOINT, &mut usb_buffer, Duration::from_millis(100)) {
             Ok(_) => Ok(()),
             Err(err) => match err {
                 // ignore timeout errors
