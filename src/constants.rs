@@ -9,3 +9,6 @@ pub const G13_LED_ENDPOINT: u8      = G13_LED_MODE_ENDPOINT;
 pub const G13_KEY_INTERFACE: u8     = 1;
 pub const G13_KEYS_ENDPOINT: u8     = 0x80 | G13_KEY_INTERFACE; // request_type(Direction::In, RequestType::Standard, Recipient::Device) | G13_KEY_INTERFACE;
 
+pub const G13_VENDOR_ID:  u16 = 0x046d;
+pub const G13_PRODUCT_ID: u16 = 0xc21c;
+

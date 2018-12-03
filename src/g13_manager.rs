@@ -1,4 +1,5 @@
 use g13_device::G13Device;
+use constants::*;
 
 pub struct G13Manager {
     context: libusb::Context,
@@ -15,7 +16,7 @@ impl G13Manager {
         for mut device in self.context.devices().unwrap().iter() {
             let device_desc = device.device_descriptor().unwrap();
             
-            if device_desc.vendor_id() == 0x046d && device_desc.product_id() == 0xc21c {
+            if device_desc.vendor_id() == G13_VENDOR_ID && device_desc.product_id() == G13_PRODUCT_ID {
                 list.push(G13Device::from_device(device).unwrap());
             }
         }
