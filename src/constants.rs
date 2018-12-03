@@ -12,3 +12,6 @@ pub const G13_KEYS_ENDPOINT: u8     = 0x80 | G13_KEY_INTERFACE; // request_type(
 pub const G13_VENDOR_ID:  u16 = 0x046d;
 pub const G13_PRODUCT_ID: u16 = 0xc21c;
 
+// test with the first 22 keys first
+pub const G13_KEYS_LENGTH: usize = 22;
+

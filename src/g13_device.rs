@@ -3,9 +3,12 @@ use constants::*;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::time::Duration;
 
+use g13_key::{G13Key, G13_KEYS};
+
 pub struct G13Device<'a> {
     device: libusb::Device<'a>,
-    handle: libusb::DeviceHandle<'a>
+    handle: libusb::DeviceHandle<'a>,
+    keys: [G13Key; G13_KEYS_LENGTH]
 }
 
 impl<'a> G13Device<'a> {
@@ -24,9 +27,11 @@ impl<'a> G13Device<'a> {
         }
         handle.claim_interface(interface)?;
 
+        let keys = [G13Key::new(); G13_KEYS_LENGTH];
         let device = G13Device {
             device: device,
-            handle: handle
+            handle: handle,
+            keys: keys
         };
 
         device.set_mode_leds(0);

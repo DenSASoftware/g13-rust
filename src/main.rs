@@ -5,6 +5,7 @@ extern crate simple_logger;
 
 mod g13_manager;
 mod g13_device;
+mod g13_key;
 mod constants;
 
 use g13_manager::G13Manager;
