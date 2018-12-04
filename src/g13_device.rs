@@ -71,6 +71,11 @@ impl<'a> G13Device<'a> {
 
     fn process_keys(&mut self, bytes: &[u8; 8]) {
         for i in 0..G13_KEYS_LENGTH {
+            // ignore some inputs that aren't really keys
+            if i == 22 || i == 23 || i > 35 {
+                continue
+            }
+
             let byte = bytes[3 + (i / 8)];
             let bit = byte & (1 << (i % 8));
             let pressed = bit != 0;
