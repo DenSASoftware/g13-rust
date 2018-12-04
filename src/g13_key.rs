@@ -1,6 +1,6 @@
 #[derive(Copy, Clone)]
 pub struct G13Key {
-    is_pressed: bool
+    pub is_pressed: bool
 }
 
 impl G13Key {
@@ -24,8 +24,8 @@ impl Default for G13Key {
 }
 
 pub struct G13KeyInformation {
-    index: u8,
-    name: &'static str
+    pub index: u8,
+    pub name: &'static str
 }
 
 pub const G13_KEYS: [G13KeyInformation; 22] = [

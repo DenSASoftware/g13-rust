@@ -53,15 +53,37 @@ impl<'a> G13Device<'a> {
         self.handle.write_control(G13_LED_ENDPOINT, 9, 0x307, 0, &usb_data, Duration::from_secs(1)).unwrap_or(0);
     }
 
-    pub fn read_keys(&self) -> Result<(), libusb::Error> {
+    pub fn read_keys(&mut self) -> Result<(), libusb::Error> {
         let mut usb_buffer = [0 as u8; 8];
 
         match self.handle.read_interrupt(G13_KEYS_ENDPOINT, &mut usb_buffer, Duration::from_millis(100)) {
-            Ok(_) => Ok(()),
+            Ok(_) => {
+                self.process_keys(&usb_buffer);
+                Ok(())
+            },
             Err(err) => match err {
                 // ignore timeout errors
                 libusb::Error::Timeout => Ok(()),
                 _ => Err(err)
+            }
+        }
+    }
+
+    fn process_keys(&mut self, bytes: &[u8; 8]) {
+        for i in 0..G13_KEYS_LENGTH {
+            let byte = bytes[3 + (i / 8)];
+            let bit = byte & (1 << (i % 8));
+            let pressed = bit != 0;
+
+            let mut key = &mut self.keys[i];
+            if pressed != key.is_pressed {
+                let key_info = &G13_KEYS[i];
+                match key.is_pressed {
+                    true => key.released(key_info.name),
+                    false => key.pressed(key_info.name)
+                }
+
+                key.is_pressed = !key.is_pressed;
             }
         }
     }

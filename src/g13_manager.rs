@@ -24,9 +24,9 @@ impl G13Manager {
         list
     }
 
-    pub fn mainloop_with_devices<'a>(&self, devices: &Vec<G13Device<'a>>) {
+    pub fn mainloop_with_devices<'a>(&self, devices: &mut Vec<G13Device<'a>>) {
         loop {
-            for device in devices {
+            for device in devices.iter_mut() {
                 match device.read_keys() {
                     Err(error) => error!("An error occurred: {}", error),
                     _ => {}
@@ -36,7 +36,7 @@ impl G13Manager {
     }
 
     pub fn mainloop(&self) {
-        self.mainloop_with_devices(&self.find_g13s());
+        self.mainloop_with_devices(&mut self.find_g13s());
     }
 }
 
