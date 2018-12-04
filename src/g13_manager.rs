@@ -27,7 +27,7 @@ impl G13Manager {
     pub fn mainloop_with_devices<'a>(&self, devices: &mut Vec<G13Device<'a>>) {
         loop {
             for device in devices.iter_mut() {
-               if let Err(error) = device.read_keys() { 
+                if let Err(error) = device.read_keys() {
                     error!("An error occurred: {}", error);
                 }
             }
