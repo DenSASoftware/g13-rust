@@ -2,6 +2,7 @@
 name = "g13"
 version = "0.1.0"
 authors = ["setup"]
+edition = "2018"
 
 [dependencies]
 libusb = "0.3"

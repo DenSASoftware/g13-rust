@@ -1,9 +1,9 @@
-use constants::*;
+use crate::constants::*;
 
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::time::Duration;
 
-use g13_key::{G13Key, G13_KEYS};
+use crate::g13_key::{G13Key, G13_KEYS};
 
 pub struct G13Device<'a> {
     device: libusb::Device<'a>,

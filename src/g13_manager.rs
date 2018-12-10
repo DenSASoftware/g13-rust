@@ -1,5 +1,5 @@
-use g13_device::G13Device;
-use constants::*;
+use crate::g13_device::G13Device;
+use crate::constants::*;
 
 pub struct G13Manager {
     context: libusb::Context,
@@ -13,7 +13,7 @@ impl G13Manager {
     pub fn find_g13s<'a>(&'a self) -> Vec<G13Device<'a>> {
         let mut list = Vec::new();
 
-        for mut device in self.context.devices().unwrap().iter() {
+        for device in self.context.devices().unwrap().iter() {
             let device_desc = device.device_descriptor().unwrap();
             
             if device_desc.vendor_id() == G13_VENDOR_ID && device_desc.product_id() == G13_PRODUCT_ID {

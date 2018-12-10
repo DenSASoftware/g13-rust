@@ -8,7 +8,7 @@ mod g13_device;
 mod g13_key;
 mod constants;
 
-use g13_manager::G13Manager;
+use crate::g13_manager::G13Manager;
 
 fn main() {
     // enable logging
