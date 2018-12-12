@@ -1,6 +1,6 @@
 use crate::constants::*;
 
-use std::fmt::{Display, Formatter, Result as FmtResult};
+use std::fmt::{Debug, Formatter, Result as FmtResult};
 use std::time::Duration;
 
 use crate::g13_key::{G13Key, G13_KEYS};
@@ -36,7 +36,7 @@ impl<'a> G13Device<'a> {
 
         device.set_mode_leds(0);
         device.set_led_color(0, 255, 255);
-        info!("Initialized {}", device);
+        info!("Initialized {:?}", device);
 
         Ok(device)
     }
@@ -94,7 +94,7 @@ impl<'a> G13Device<'a> {
     }
 }
 
-impl<'a> Display for G13Device<'a> {
+impl<'a> Debug for G13Device<'a> {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         write!(f, "G13Device(Bus: {:03}, Address: {:03})", self.device.bus_number(), self.device.address())
     }
