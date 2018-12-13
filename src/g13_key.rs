@@ -1,4 +1,3 @@
-#[derive(Copy, Clone)]
 pub struct G13Key {
     pub is_pressed: bool
 }
@@ -14,12 +13,6 @@ impl G13Key {
 
     pub fn released(&self, key_name: &str) {
         info!("Key {} got released", key_name);
-    }
-}
-
-impl Default for G13Key {
-    fn default() -> Self {
-        G13Key { is_pressed: false }
     }
 }
 

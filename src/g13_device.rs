@@ -27,7 +27,21 @@ impl<'a> G13Device<'a> {
         }
         handle.claim_interface(interface)?;
 
-        let keys = [G13Key::new(); G13_KEYS_LENGTH];
+        // since rust still doesn't allow to initialize an sized array without default value of a
+        // cloneable type and the clone-trait on the key caused problems in the past we have this
+        // monstrosity
+        let keys: [G13Key; G13_KEYS_LENGTH] = [
+            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
+            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
+            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
+            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
+            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
+            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
+            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
+            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
+            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
+            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
+        ];
         let device = G13Device {
             device: device,
             handle: handle,
