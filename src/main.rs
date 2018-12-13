@@ -1,5 +1,4 @@
 extern crate libusb;
-#[macro_use]
 extern crate log;
 extern crate simple_logger;
 
@@ -15,5 +14,5 @@ fn main() {
     simple_logger::init().unwrap();
 
     let manager = G13Manager::new().unwrap();
-     manager.mainloop();
+    manager.mainloop();
 }

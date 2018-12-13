@@ -1,6 +1,8 @@
 use crate::g13_device::G13Device;
 use crate::constants::*;
 
+use log::error;
+
 pub struct G13Manager {
     context: libusb::Context,
 }

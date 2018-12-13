@@ -1,3 +1,5 @@
+use log::info;
+
 pub struct G13Key {
     pub is_pressed: bool
 }
