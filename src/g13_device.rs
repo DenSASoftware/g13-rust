@@ -70,6 +70,16 @@ impl<'a> G13Device<'a> {
         self.handle.write_interrupt(G13_LCD_ENDPOINT, &mut usb_data, Duration::from_secs(1)).unwrap_or(0);
     }
 
+    pub fn write_lcd2d(&self, pixels: &[[u8; 160]; 6]) {
+        let mut usb_data = [0u8; 992];
+        usb_data[0] = 3;
+        for i in 0..6 {
+            usb_data[32 + 160 * i..32 + 160 * (i + 1)].copy_from_slice(&pixels[i]);
+        }
+
+        self.handle.write_interrupt(G13_LCD_ENDPOINT, &mut usb_data, Duration::from_secs(1)).unwrap_or(0);
+    }
+
     pub fn set_mode_leds(&self, leds: i32) {
         let usb_data = [5, leds as u8, 0, 0, 0];
 
