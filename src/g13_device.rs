@@ -52,6 +52,7 @@ impl<'a> G13Device<'a> {
         device.init_lcd();
         device.set_mode_leds(0);
         device.set_led_color(0, 255, 255);
+        device.clear_lcd();
         info!("Initialized {:?}", device);
 
         Ok(device)
@@ -62,19 +63,24 @@ impl<'a> G13Device<'a> {
         self.handle.write_control(0, 9, 1, 0, &_dummy_arr, Duration::from_secs(1)).unwrap_or(0);
     }
 
-    pub fn write_lcd(&self, pixels: &[u8; 960]) {
-        let mut usb_data = [0u8; 992];
+    pub fn clear_lcd(&self) {
+        let lcd_data = [0; G13_LCD_ARRAY_LEN];
+        self.write_lcd(&lcd_data);
+    }
+
+    pub fn write_lcd(&self, pixels: &[u8; G13_LCD_ARRAY_LEN]) {
+        let mut usb_data = [0u8; G13_LCD_BUFFER_LEN];
         usb_data[0] = 3;
-        usb_data[32..].copy_from_slice(pixels);
+        usb_data[G13_LCD_BUFFER_PADDING..].copy_from_slice(pixels);
 
         self.handle.write_interrupt(G13_LCD_ENDPOINT, &mut usb_data, Duration::from_secs(1)).unwrap_or(0);
     }
 
-    pub fn write_lcd2d(&self, pixels: &[[u8; 160]; 6]) {
-        let mut usb_data = [0u8; 992];
+    pub fn write_lcd2d(&self, pixels: &[[u8; G13_LCD_WIDTH]; G13_LCD_HEIGHT_IN_BYTES]) {
+        let mut usb_data = [0u8; G13_LCD_BUFFER_LEN];
         usb_data[0] = 3;
-        for i in 0..6 {
-            usb_data[32 + 160 * i..32 + 160 * (i + 1)].copy_from_slice(&pixels[i]);
+        for i in 0..G13_LCD_HEIGHT_IN_BYTES {
+            usb_data[G13_LCD_BUFFER_PADDING + G13_LCD_WIDTH * i..G13_LCD_BUFFER_PADDING + G13_LCD_WIDTH * (i + 1)].copy_from_slice(&pixels[i]);
         }
 
         self.handle.write_interrupt(G13_LCD_ENDPOINT, &mut usb_data, Duration::from_secs(1)).unwrap_or(0);
