@@ -9,7 +9,7 @@ impl G13Key {
     pub fn new() -> Self {
         G13Key {
             is_pressed: false,
-            action: G13KeyAction::MultipleKeys(vec![uinput::event::keyboard::Key::A, uinput::event::keyboard::Key::_5])
+            action: G13KeyAction::Noop
         }
     }
 }
