@@ -1,20 +1,16 @@
-use log::info;
+use crate::g13_device::G13Device;
 
 pub struct G13Key {
-    pub is_pressed: bool
+   pub is_pressed: bool,
+   pub action: G13KeyAction
 }
 
 impl G13Key {
     pub fn new() -> Self {
-        G13Key { is_pressed: false }
-    }
-
-    pub fn pressed(&self, key_name: &str) {
-        info!("Key {} got pressed", key_name);
-    }
-
-    pub fn released(&self, key_name: &str) {
-        info!("Key {} got released", key_name);
+        G13Key {
+            is_pressed: false,
+            action: G13KeyAction::Noop
+        }
     }
 }
 
@@ -65,4 +61,36 @@ pub const G13_KEYS: [G13KeyInformation; 40] = [
     G13KeyInformation { index: 38, name: "LIGHT2" },
     G13KeyInformation { index: 39, name: "MISC_TOGGLE" },
 ];
+
+#[derive(Copy, Clone)]
+pub enum G13KeyAction<T=uinput::event::keyboard::Key> where T: uinput::event::Press + uinput::event::Release + Clone {
+    Noop,
+    Key(T),
+}
+
+impl<T> G13KeyAction<T> where T: uinput::event::Press + uinput::event::Release + Clone {
+    pub fn pressed(&self, device: &mut G13Device) -> Result<(), failure::Error> {
+        match self {
+            G13KeyAction::Noop => { Ok(()) },
+            G13KeyAction::Key(key) => {
+                device.input.press(key)?;
+                device.input.synchronize()?;
+
+                Ok(())
+            }
+        }
+    }
+
+    pub fn released(&self, device: &mut G13Device) -> Result<(), failure::Error> {
+        match self {
+            G13KeyAction::Noop => { Ok(()) },
+            G13KeyAction::Key(key) => {
+                device.input.release(key)?;
+                device.input.synchronize()?;
+
+                Ok(())
+            }
+        }
+    }
+}
 

@@ -1,5 +1,5 @@
 use crate::constants::*;
-use crate::g13_key::{G13Key, G13_KEYS};
+use crate::g13_key::{G13Key};
 
 use log::{info, error};
 
@@ -9,6 +9,7 @@ use std::time::Duration;
 pub struct G13Device<'a> {
     device: libusb::Device<'a>,
     handle: libusb::DeviceHandle<'a>,
+    pub input: uinput::Device,
     keys: [G13Key; G13_KEYS_LENGTH]
 }
 
@@ -43,9 +44,12 @@ impl<'a> G13Device<'a> {
             G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
             G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
         ];
+
+        let input_device = uinput::default().unwrap().name("G13").unwrap().event(uinput::event::Keyboard::All).unwrap().create().unwrap();
         let device = G13Device {
             device: device,
             handle: handle,
+            input: input_device,
             keys: keys
         };
 
@@ -125,15 +129,15 @@ impl<'a> G13Device<'a> {
             let bit = byte & (1 << (i % 8));
             let pressed = bit != 0;
 
-            let mut key = &mut self.keys[i];
-            if pressed != key.is_pressed {
-                let key_info = &G13_KEYS[i];
-                match key.is_pressed {
-                    true => key.released(key_info.name),
-                    false => key.pressed(key_info.name)
+            let key_pressed = self.keys[i].is_pressed;
+            if pressed != key_pressed {
+                let key_action = &self.keys[i].action.clone();
+                match key_pressed {
+                    true => key_action.released(self).unwrap(),
+                    false => key_action.pressed(self).unwrap()
                 }
 
-                key.is_pressed = !key.is_pressed;
+                self.keys[i].is_pressed = !key_pressed;
             }
         }
     }

@@ -1,6 +1,8 @@
 extern crate libusb;
+extern crate uinput;
 extern crate log;
 extern crate simple_logger;
+extern crate failure;
 
 mod g13_manager;
 mod g13_device;
