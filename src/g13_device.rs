@@ -49,11 +49,25 @@ impl<'a> G13Device<'a> {
             keys: keys
         };
 
+        device.init_lcd();
         device.set_mode_leds(0);
         device.set_led_color(0, 255, 255);
         info!("Initialized {:?}", device);
 
         Ok(device)
+    }
+
+    fn init_lcd(&self) {
+        let _dummy_arr = [0u8; 0];
+        self.handle.write_control(0, 9, 1, 0, &_dummy_arr, Duration::from_secs(1)).unwrap_or(0);
+    }
+
+    pub fn write_lcd(&self, pixels: &[u8; 960]) {
+        let mut usb_data = [0u8; 992];
+        usb_data[0] = 3;
+        usb_data[32..].copy_from_slice(pixels);
+
+        self.handle.write_interrupt(G13_LCD_ENDPOINT, &mut usb_data, Duration::from_secs(1)).unwrap_or(0);
     }
 
     pub fn set_mode_leds(&self, leds: i32) {
