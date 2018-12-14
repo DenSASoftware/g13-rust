@@ -9,7 +9,7 @@ impl G13Key {
     pub fn new() -> Self {
         G13Key {
             is_pressed: false,
-            action: G13KeyAction::Noop
+            action: G13KeyAction::MultipleKeys(vec![uinput::event::keyboard::Key::A, uinput::event::keyboard::Key::_5])
         }
     }
 }
@@ -62,18 +62,28 @@ pub const G13_KEYS: [G13KeyInformation; 40] = [
     G13KeyInformation { index: 39, name: "MISC_TOGGLE" },
 ];
 
-#[derive(Copy, Clone)]
-pub enum G13KeyAction<T=uinput::event::keyboard::Key> where T: uinput::event::Press + uinput::event::Release + Clone {
+#[derive(Clone)]
+pub enum G13KeyAction<T=uinput::event::keyboard::Key>
+        where T: uinput::event::Press + uinput::event::Release + Copy + Clone {
     Noop,
     Key(T),
+    MultipleKeys(Vec<T>),
 }
 
-impl<T> G13KeyAction<T> where T: uinput::event::Press + uinput::event::Release + Clone {
+impl<T> G13KeyAction<T> where T: uinput::event::Press + uinput::event::Release + Copy {
     pub fn pressed(&self, device: &mut G13Device) -> Result<(), failure::Error> {
         match self {
             G13KeyAction::Noop => { Ok(()) },
             G13KeyAction::Key(key) => {
                 device.input.press(key)?;
+                device.input.synchronize()?;
+
+                Ok(())
+            },
+            G13KeyAction::MultipleKeys(ref keys) => {
+                for key in keys.iter() {
+                    device.input.click(key)?
+                }
                 device.input.synchronize()?;
 
                 Ok(())
@@ -89,7 +99,8 @@ impl<T> G13KeyAction<T> where T: uinput::event::Press + uinput::event::Release +
                 device.input.synchronize()?;
 
                 Ok(())
-            }
+            },
+            G13KeyAction::MultipleKeys(_) => { Ok(()) }
         }
     }
 }
