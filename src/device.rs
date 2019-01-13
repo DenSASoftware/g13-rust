@@ -101,43 +101,24 @@ impl<'a> G13Device<'a> {
 
         self.handle.write_control(G13_LED_ENDPOINT, 9, 0x307, 0, &usb_data, Duration::from_secs(1)).unwrap_or(0);
     }
+}
 
-    pub fn read_keys(&mut self) -> Result<(), G13Error> {
+pub trait ReadKeys<'a, 'b> where 'a: 'b {
+    fn read_keys(&'a mut self) -> Result<KeyIterator<'b, 'a>, G13Error>;
+}
+
+impl<'a, 'b> ReadKeys<'a, 'b> for G13Device<'a> where 'a: 'b {
+    fn read_keys(&'b mut self) -> Result<KeyIterator<'b, 'a>, G13Error> where 'a: 'b {
         let mut usb_buffer = [0 as u8; 8];
 
         match self.handle.read_interrupt(G13_KEYS_ENDPOINT, &mut usb_buffer, Duration::from_millis(100)) {
             Ok(_) => {
-                self.process_keys(&usb_buffer);
-                Ok(())
+                Ok(KeyIterator::new(self, usb_buffer))
             },
             Err(err) => match err {
                 // ignore timeout errors
-                libusb::Error::Timeout => Ok(()),
+                // libusb::Error::Timeout => Ok(()),
                 _ => Err(err.into())
-            }
-        }
-    }
-
-    fn process_keys(&mut self, bytes: &[u8; 8]) {
-        for i in 0..G13_KEYS_LENGTH {
-            // ignore some inputs that aren't really keys
-            if i == 22 || i == 23 || i > 35 {
-                continue
-            }
-
-            let byte = bytes[3 + (i / 8)];
-            let bit = byte & (1 << (i % 8));
-            let pressed = bit != 0;
-
-            let key_pressed = self.keys[i].is_pressed;
-            if pressed != key_pressed {
-                let key_action = &self.keys[i].action.clone();
-                match key_pressed {
-                    true => key_action.released(self).unwrap(),
-                    false => key_action.pressed(self).unwrap()
-                }
-
-                self.keys[i].is_pressed = !key_pressed;
             }
         }
     }
@@ -146,6 +127,56 @@ impl<'a> G13Device<'a> {
 impl<'a> Debug for G13Device<'a> {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         write!(f, "G13Device(Bus: {:03}, Address: {:03})", self.device.bus_number(), self.device.address())
+    }
+}
+
+pub struct KeyIterator<'a, 'b: 'a> {
+    device: &'a mut G13Device<'b>,
+    bytes: [u8; 8],
+    i: usize,
+}
+
+impl<'a, 'b> KeyIterator<'a, 'b> {
+    pub fn new(device: &'a mut G13Device<'b>, bytes: [u8; 8]) -> Self {
+        KeyIterator {
+            device,
+            bytes,
+            i: 0,
+        }
+    }
+}
+
+impl<'a, 'b> Iterator for KeyIterator<'a, 'b> {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while self.i < G13_KEYS_LENGTH {
+            let i = self.i;
+            // ignore some inputs that aren't really keys
+            if i == 22 || i == 23 || i > 35 {
+                continue
+            }
+
+            let byte = self.bytes[3 + (i / 8)];
+            let bit = byte & (1 << (i % 8));
+            let pressed = bit != 0;
+
+            let key_pressed = self.device.keys[i].is_pressed;
+            if pressed != key_pressed {
+                self.device.keys[i].is_pressed = !key_pressed;
+                return Some(i);
+            }
+
+            self.i += 1;
+        }
+
+        None
+    }
+}
+
+impl<'a, 'b> Drop for KeyIterator<'a, 'b> {
+    fn drop(&mut self) {
+        self.for_each(drop);
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::device::G13Device;
+use crate::device::{ReadKeys, G13Device};
 use crate::constants::*;
 
 use std::thread;
@@ -29,29 +29,28 @@ impl G13Manager {
         list
     }
 
-    pub fn mainloop_with_devices<'a>(&self, devices: &mut Vec<G13Device<'a>>) {
+    pub fn mainloop(&self) {
+        let mut devices = self.find_g13s();
+
         if devices.is_empty() {
             warn!("Started mainloop without devices, as of now you should connect a G13 and restart this program");
+            return;
         }
 
         loop {
             for device in devices.iter_mut() {
-                if let Err(error) = device.read_keys() {
-                    error!("An error occurred: {:?}", error);
+                match device.read_keys() {
+                    Ok(iter) => {
+                        for i in iter {
+                            println!("{}", i);
+                        }
+                    },
+                    Err(error) => {
+                        error!("An error occurred: {:?}", error);
+                    }
                 }
             }
-
-            // avoid wasting cpu-cycles when no devices are present
-            // maybe add some code to scan for new devices here, because as of now we could simply
-            // terminate when no devices are present
-            if devices.is_empty() {
-                thread::sleep(Duration::from_millis(100));
-            }
         }
-    }
-
-    pub fn mainloop(&self) {
-        self.mainloop_with_devices(&mut self.find_g13s());
     }
 }
 
