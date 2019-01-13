@@ -62,6 +62,24 @@ pub const G13_KEYS: [G13KeyInformation; 40] = [
     G13KeyInformation { index: 39, name: "MISC_TOGGLE" },
 ];
 
+#[derive(Debug)]
+pub enum G13Error {
+    UInputError(uinput::Error),
+    USBError(libusb::Error),
+}
+
+impl From<uinput::Error> for G13Error {
+    fn from(err: uinput::Error) -> Self {
+        G13Error::UInputError(err)
+    }
+}
+
+impl From<libusb::Error> for G13Error {
+    fn from(err: libusb::Error) -> Self {
+        G13Error::USBError(err)
+    }
+}
+
 #[derive(Clone)]
 pub enum G13KeyAction<T=uinput::event::keyboard::Key>
         where T: uinput::event::Press + uinput::event::Release + Copy + Clone {
@@ -71,7 +89,7 @@ pub enum G13KeyAction<T=uinput::event::keyboard::Key>
 }
 
 impl<T> G13KeyAction<T> where T: uinput::event::Press + uinput::event::Release + Copy {
-    pub fn pressed(&self, device: &mut G13Device) -> Result<(), failure::Error> {
+    pub fn pressed(&self, device: &mut G13Device) -> Result<(), G13Error> {
         match self {
             G13KeyAction::Noop => { Ok(()) },
             G13KeyAction::Key(key) => {
@@ -91,7 +109,7 @@ impl<T> G13KeyAction<T> where T: uinput::event::Press + uinput::event::Release +
         }
     }
 
-    pub fn released(&self, device: &mut G13Device) -> Result<(), failure::Error> {
+    pub fn released(&self, device: &mut G13Device) -> Result<(), G13Error> {
         match self {
             G13KeyAction::Noop => { Ok(()) },
             G13KeyAction::Key(key) => {

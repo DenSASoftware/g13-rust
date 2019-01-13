@@ -1,5 +1,5 @@
 use crate::constants::*;
-use crate::g13_key::{G13Key};
+use crate::g13_key::{G13Key, G13Error};
 
 use log::{info, error};
 
@@ -102,7 +102,7 @@ impl<'a> G13Device<'a> {
         self.handle.write_control(G13_LED_ENDPOINT, 9, 0x307, 0, &usb_data, Duration::from_secs(1)).unwrap_or(0);
     }
 
-    pub fn read_keys(&mut self) -> Result<(), failure::Error> {
+    pub fn read_keys(&mut self) -> Result<(), G13Error> {
         let mut usb_buffer = [0 as u8; 8];
 
         match self.handle.read_interrupt(G13_KEYS_ENDPOINT, &mut usb_buffer, Duration::from_millis(100)) {

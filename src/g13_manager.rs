@@ -37,7 +37,7 @@ impl G13Manager {
         loop {
             for device in devices.iter_mut() {
                 if let Err(error) = device.read_keys() {
-                    error!("An error occurred: {}", error);
+                    error!("An error occurred: {:?}", error);
                 }
             }
 
