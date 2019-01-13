@@ -1,5 +1,5 @@
 use crate::constants::*;
-use crate::g13_key::{G13Key, G13Error};
+use crate::key::{G13Key, G13Error};
 
 use log::{info, error};
 

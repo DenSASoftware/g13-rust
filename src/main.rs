@@ -4,12 +4,12 @@ extern crate uinput;
 extern crate log;
 extern crate simple_logger;
 
-mod g13_manager;
-mod g13_device;
-mod g13_key;
+mod manager;
+mod device;
+mod key;
 mod constants;
 
-use crate::g13_manager::G13Manager;
+use crate::manager::G13Manager;
 
 fn main() {
     // enable logging

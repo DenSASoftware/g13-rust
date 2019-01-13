@@ -1,4 +1,4 @@
-use crate::g13_device::G13Device;
+use crate::device::G13Device;
 use crate::constants::*;
 
 use std::thread;

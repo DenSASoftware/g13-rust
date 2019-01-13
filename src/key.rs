@@ -1,4 +1,4 @@
-use crate::g13_device::G13Device;
+use crate::device::G13Device;
 
 pub struct G13Key {
    pub is_pressed: bool,
