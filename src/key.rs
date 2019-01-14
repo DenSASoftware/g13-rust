@@ -142,32 +142,15 @@ impl<T> G13KeyAction<T> where T: uinput::event::Press + uinput::event::Release +
     pub fn pressed(&self, device: &mut G13Device) -> Result<(), G13Error> {
         match self {
             G13KeyAction::Noop => { Ok(()) },
-            G13KeyAction::Key(key) => {
-                device.input.press(key)?;
-                device.input.synchronize()?;
-
-                Ok(())
-            },
-            G13KeyAction::MultipleKeys(ref keys) => {
-                for key in keys.iter() {
-                    device.input.click(key)?
-                }
-                device.input.synchronize()?;
-
-                Ok(())
-            }
+            G13KeyAction::Key(_key) => { Ok(()) },
+            G13KeyAction::MultipleKeys(ref _keys) => { Ok(()) }
         }
     }
 
     pub fn released(&self, device: &mut G13Device) -> Result<(), G13Error> {
         match self {
             G13KeyAction::Noop => { Ok(()) },
-            G13KeyAction::Key(key) => {
-                device.input.release(key)?;
-                device.input.synchronize()?;
-
-                Ok(())
-            },
+            G13KeyAction::Key(_key) => { Ok(()) },
             G13KeyAction::MultipleKeys(_) => { Ok(()) }
         }
     }

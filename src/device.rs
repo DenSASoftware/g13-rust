@@ -9,7 +9,6 @@ use std::time::Duration;
 pub struct G13Device<'a> {
     device: libusb::Device<'a>,
     handle: libusb::DeviceHandle<'a>,
-    pub input: uinput::Device,
     keys: [G13Key; G13_KEYS_LENGTH]
 }
 
@@ -45,11 +44,9 @@ impl<'a> G13Device<'a> {
             G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
         ];
 
-        let input_device = uinput::default().unwrap().name("G13").unwrap().event(uinput::event::Keyboard::All).unwrap().create().unwrap();
         let device = G13Device {
             device: device,
             handle: handle,
-            input: input_device,
             keys: keys
         };
 
