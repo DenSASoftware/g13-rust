@@ -98,6 +98,12 @@ pub enum G13KeyPress {
     Released
 }
 
+impl From<bool> for G13KeyPress {
+    fn from(b: bool) -> Self {
+        if b { G13KeyPress::Pressed } else { G13KeyPress::Released }
+    }
+}
+
 pub type G13KeyEvent = (G13Button, G13KeyPress);
 
 #[derive(Debug)]

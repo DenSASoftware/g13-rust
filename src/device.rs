@@ -136,8 +136,7 @@ impl<'a, 'b> Iterator for KeyIterator<'a, 'b> {
                 self.device.keys[i] = !key_pressed;
                 self.i += 1;
 
-                let press = if pressed { G13KeyPress::Pressed } else { G13KeyPress::Released };
-                return Some((G13Button::from(i), press));
+                return Some((G13Button::from(i), G13KeyPress::from(pressed)));
             }
 
             self.i += 1;

@@ -41,7 +41,7 @@ impl G13Manager {
         let (click_sender, click_recv) = std::sync::mpsc::channel();
 
         std::thread::spawn(move || {
-            for (button, press_type) in click_recv.iter() {
+            for (_button, press_type) in click_recv.iter() {
                 match press_type {
                     G13KeyPress::Pressed => uinput_device.press(&uinput::event::keyboard::Key::A).unwrap(),
                     G13KeyPress::Released => uinput_device.release(&uinput::event::keyboard::Key::A).unwrap(),
