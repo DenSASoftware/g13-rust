@@ -1,17 +1,5 @@
 use crate::device::G13Device;
 
-pub struct G13Key {
-   pub is_pressed: bool,
-}
-
-impl G13Key {
-    pub fn new() -> Self {
-        G13Key {
-            is_pressed: false,
-        }
-    }
-}
-
 #[derive(Debug)]
 pub enum G13Button {
     G1,

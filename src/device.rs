@@ -1,5 +1,5 @@
 use crate::constants::*;
-use crate::key::{G13Key, G13Error, G13KeyEvent, G13Button, G13KeyPress};
+use crate::key::{G13Error, G13KeyEvent, G13Button, G13KeyPress};
 
 use log::{info, error};
 
@@ -9,7 +9,7 @@ use std::time::Duration;
 pub struct G13Device<'a> {
     device: libusb::Device<'a>,
     handle: libusb::DeviceHandle<'a>,
-    keys: [G13Key; G13_KEYS_LENGTH]
+    keys: [bool; G13_KEYS_LENGTH]
 }
 
 impl<'a> G13Device<'a> {
@@ -28,21 +28,7 @@ impl<'a> G13Device<'a> {
         }
         handle.claim_interface(interface)?;
 
-        // since rust still doesn't allow to initialize an sized array without default value of a
-        // cloneable type and the clone-trait on the key caused problems in the past we have this
-        // monstrosity
-        let keys: [G13Key; G13_KEYS_LENGTH] = [
-            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
-            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
-            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
-            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
-            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
-            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
-            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
-            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
-            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
-            G13Key::new(), G13Key::new(), G13Key::new(), G13Key::new(),
-        ];
+        let keys = [false; G13_KEYS_LENGTH];
 
         let device = G13Device {
             device: device,
@@ -145,9 +131,9 @@ impl<'a, 'b> Iterator for KeyIterator<'a, 'b> {
             let bit = byte & (1 << (i % 8));
             let pressed = bit != 0;
 
-            let key_pressed = self.device.keys[i].is_pressed;
+            let key_pressed = self.device.keys[i];
             if pressed != key_pressed {
-                self.device.keys[i].is_pressed = !key_pressed;
+                self.device.keys[i] = !key_pressed;
                 self.i += 1;
 
                 let press = if pressed { G13KeyPress::Pressed } else { G13KeyPress::Released };
