@@ -42,7 +42,7 @@ impl G13Manager {
                 match device.read_keys() {
                     Ok(iter) => {
                         for i in iter {
-                            println!("{}", i);
+                            println!("{:?}", i);
                         }
                     },
                     Err(error) => {

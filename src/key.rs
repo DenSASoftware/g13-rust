@@ -2,65 +2,115 @@ use crate::device::G13Device;
 
 pub struct G13Key {
    pub is_pressed: bool,
-   pub action: G13KeyAction
 }
 
 impl G13Key {
     pub fn new() -> Self {
         G13Key {
             is_pressed: false,
-            action: G13KeyAction::Noop
         }
     }
 }
 
-pub struct G13KeyInformation {
-    pub index: u8,
-    pub name: &'static str
+#[derive(Debug)]
+pub enum G13Button {
+    G1,
+    G2,
+    G3,
+    G4,
+    G5,
+    G6,
+    G7,
+    G8,
+    G9,
+    G10,
+    G11,
+    G12,
+    G13,
+    G14,
+    G15,
+    G16,
+    G17,
+    G18,
+    G19,
+    G20,
+    G21,
+    G22,
+    UNDEF1,
+    LIGHTSTATE,
+    BD,
+    L1,
+    L2,
+    L3,
+    L4,
+    M1,
+    M2,
+    M3,
+    MR,
+    LEFT,
+    DOWN,
+    TOP,
+    UNDEF3,
+    LIGHT,
+    LIGHT2,
+    MISCTOGGLE,
 }
 
-pub const G13_KEYS: [G13KeyInformation; 40] = [
-    G13KeyInformation { index: 0, name: "G1" },
-    G13KeyInformation { index: 1, name: "G2" },
-    G13KeyInformation { index: 2, name: "G3" },
-    G13KeyInformation { index: 3, name: "G4" },
-    G13KeyInformation { index: 4, name: "G5" },
-    G13KeyInformation { index: 5, name: "G6" },
-    G13KeyInformation { index: 6, name: "G7" },
-    G13KeyInformation { index: 7, name: "G8" },
-    G13KeyInformation { index: 8, name: "G9" },
-    G13KeyInformation { index: 9, name: "G10" },
-    G13KeyInformation { index: 10, name: "G11" },
-    G13KeyInformation { index: 11, name: "G12" },
-    G13KeyInformation { index: 12, name: "G13" },
-    G13KeyInformation { index: 13, name: "G14" },
-    G13KeyInformation { index: 14, name: "G15" },
-    G13KeyInformation { index: 15, name: "G16" },
-    G13KeyInformation { index: 16, name: "G17" },
-    G13KeyInformation { index: 17, name: "G18" },
-    G13KeyInformation { index: 18, name: "G19" },
-    G13KeyInformation { index: 19, name: "G20" },
-    G13KeyInformation { index: 20, name: "G21" },
-    G13KeyInformation { index: 21, name: "G22" },
-    G13KeyInformation { index: 22, name: "UNDEF1" },
-    G13KeyInformation { index: 23, name: "LIGHT_STATE" },
-    G13KeyInformation { index: 24, name: "BD" },
-    G13KeyInformation { index: 25, name: "L1" },
-    G13KeyInformation { index: 26, name: "L2" },
-    G13KeyInformation { index: 27, name: "L3" },
-    G13KeyInformation { index: 28, name: "L4" },
-    G13KeyInformation { index: 29, name: "M1" },
-    G13KeyInformation { index: 30, name: "M2" },
-    G13KeyInformation { index: 31, name: "M3" },
-    G13KeyInformation { index: 32, name: "MR" },
-    G13KeyInformation { index: 33, name: "LEFT" },
-    G13KeyInformation { index: 34, name: "DOWN" },
-    G13KeyInformation { index: 35, name: "TOP" },
-    G13KeyInformation { index: 36, name: "UNDEF3" },
-    G13KeyInformation { index: 37, name: "LIGHT" },
-    G13KeyInformation { index: 38, name: "LIGHT2" },
-    G13KeyInformation { index: 39, name: "MISC_TOGGLE" },
-];
+impl From<usize> for G13Button {
+    fn from(i: usize) -> G13Button {
+        match i {
+            00 => G13Button::G1,
+            01 => G13Button::G2,
+            02 => G13Button::G3,
+            03 => G13Button::G4,
+            04 => G13Button::G5,
+            05 => G13Button::G6,
+            06 => G13Button::G7,
+            07 => G13Button::G8,
+            08 => G13Button::G9,
+            09 => G13Button::G10,
+            10 => G13Button::G11,
+            11 => G13Button::G12,
+            12 => G13Button::G13,
+            13 => G13Button::G14,
+            14 => G13Button::G15,
+            15 => G13Button::G16,
+            16 => G13Button::G17,
+            17 => G13Button::G18,
+            18 => G13Button::G19,
+            19 => G13Button::G20,
+            20 => G13Button::G21,
+            21 => G13Button::G22,
+            22 => G13Button::UNDEF1,
+            23 => G13Button::LIGHTSTATE,
+            24 => G13Button::BD,
+            25 => G13Button::L1,
+            26 => G13Button::L2,
+            27 => G13Button::L3,
+            28 => G13Button::L4,
+            29 => G13Button::M1,
+            30 => G13Button::M2,
+            31 => G13Button::M3,
+            32 => G13Button::MR,
+            33 => G13Button::LEFT,
+            34 => G13Button::DOWN,
+            35 => G13Button::TOP,
+            36 => G13Button::UNDEF3,
+            37 => G13Button::LIGHT,
+            38 => G13Button::LIGHT2,
+            39 => G13Button::MISCTOGGLE,
+            _ => panic!("the coder was lazy and now you need to pass a value in range 0..40")
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum G13KeyPress {
+    Pressed,
+    Released
+}
+
+pub type G13KeyEvent = (G13Button, G13KeyPress);
 
 #[derive(Debug)]
 pub enum G13Error {

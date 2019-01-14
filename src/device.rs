@@ -1,5 +1,5 @@
 use crate::constants::*;
-use crate::key::{G13Key, G13Error};
+use crate::key::{G13Key, G13Error, G13KeyEvent, G13Button, G13KeyPress};
 
 use log::{info, error};
 
@@ -133,7 +133,7 @@ impl<'a, 'b> KeyIterator<'a, 'b> {
 }
 
 impl<'a, 'b> Iterator for KeyIterator<'a, 'b> {
-    type Item = usize;
+    type Item = G13KeyEvent;
 
     fn next(&mut self) -> Option<Self::Item> {
         while self.i < G13_KEYS_LENGTH {
@@ -153,7 +153,8 @@ impl<'a, 'b> Iterator for KeyIterator<'a, 'b> {
                 self.device.keys[i].is_pressed = !key_pressed;
                 self.i += 1;
 
-                return Some(i);
+                let press = if pressed { G13KeyPress::Pressed } else { G13KeyPress::Released };
+                return Some((G13Button::from(i), press));
             }
 
             self.i += 1;
