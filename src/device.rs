@@ -105,16 +105,8 @@ impl<'a> G13Device<'a> {
     pub fn read_keys<'b>(&'b mut self) -> Result<KeyIterator<'b, 'a>, G13Error> where 'a: 'b {
         let mut usb_buffer = [0 as u8; 8];
 
-        match self.handle.read_interrupt(G13_KEYS_ENDPOINT, &mut usb_buffer, Duration::from_millis(100)) {
-            Ok(_) => {
-                Ok(KeyIterator::new(self, usb_buffer))
-            },
-            Err(err) => match err {
-                // ignore timeout errors
-                // libusb::Error::Timeout => Ok(()),
-                _ => Err(err.into())
-            }
-        }
+        self.handle.read_interrupt(G13_KEYS_ENDPOINT, &mut usb_buffer, Duration::from_millis(100))?;
+        Ok(KeyIterator::new(self, usb_buffer))
     }
 }
 
@@ -148,6 +140,7 @@ impl<'a, 'b> Iterator for KeyIterator<'a, 'b> {
             let i = self.i;
             // ignore some inputs that aren't really keys
             if i == 22 || i == 23 || i > 35 {
+                self.i += 1;
                 continue
             }
 
@@ -158,6 +151,8 @@ impl<'a, 'b> Iterator for KeyIterator<'a, 'b> {
             let key_pressed = self.device.keys[i].is_pressed;
             if pressed != key_pressed {
                 self.device.keys[i].is_pressed = !key_pressed;
+                self.i += 1;
+
                 return Some(i);
             }
 
@@ -168,6 +163,8 @@ impl<'a, 'b> Iterator for KeyIterator<'a, 'b> {
     }
 }
 
+// Make sure the iterator gets drained to ensure that even if the iterator gets dropped the changes
+// that the iterator makes to the device still get done
 impl<'a, 'b> Drop for KeyIterator<'a, 'b> {
     fn drop(&mut self) {
         self.for_each(drop);

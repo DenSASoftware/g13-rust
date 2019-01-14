@@ -1,4 +1,5 @@
 use crate::device::G13Device;
+use crate::key::G13Error;
 use crate::constants::*;
 
 use std::thread;
@@ -34,7 +35,6 @@ impl G13Manager {
 
         if devices.is_empty() {
             warn!("Started mainloop without devices, as of now you should connect a G13 and restart this program");
-            return;
         }
 
         loop {
@@ -46,9 +46,22 @@ impl G13Manager {
                         }
                     },
                     Err(error) => {
-                        error!("An error occurred: {:?}", error);
+                        match error {
+                            G13Error::USBError(libusb::Error::Timeout) => {},
+                            _ => {
+                                error!("An error occurred: {:?}", error);
+                            }
+                        }
                     }
                 }
+            }
+
+            // avoid wasting cpu-cycles when no devices are present
+            // maybe add some code to scan for new devices here, because
+            // as of now we could simply
+            // terminate when no devices are present
+            if devices.is_empty() {
+                thread::sleep(Duration::from_millis(100));
             }
         }
     }
