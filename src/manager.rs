@@ -1,5 +1,5 @@
 use crate::device::G13Device;
-use crate::key::G13Error;
+use crate::key::{G13Error, G13KeyPress};
 use crate::constants::*;
 
 use std::thread;
@@ -37,12 +37,26 @@ impl G13Manager {
             warn!("Started mainloop without devices, as of now you should connect a G13 and restart this program");
         }
 
+        let mut uinput_device = uinput::default().unwrap().name("G13").unwrap().event(uinput::event::Keyboard::All).unwrap().create().unwrap();
+        let (click_sender, click_recv) = std::sync::mpsc::channel();
+
+        std::thread::spawn(move || {
+            for (button, press_type) in click_recv.iter() {
+                match press_type {
+                    G13KeyPress::Pressed => uinput_device.press(&uinput::event::keyboard::Key::A).unwrap(),
+                    G13KeyPress::Released => uinput_device.release(&uinput::event::keyboard::Key::A).unwrap(),
+                }
+
+                uinput_device.synchronize().unwrap();
+            }
+        });
+
         loop {
             for device in devices.iter_mut() {
                 match device.read_keys() {
                     Ok(iter) => {
                         for i in iter {
-                            println!("{:?}", i);
+                            click_sender.send(i).unwrap();
                         }
                     },
                     Err(error) => {
