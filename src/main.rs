@@ -8,6 +8,7 @@ mod manager;
 mod device;
 mod key;
 mod constants;
+mod profile;
 
 use crate::manager::G13Manager;
 

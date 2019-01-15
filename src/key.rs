@@ -92,7 +92,54 @@ impl From<usize> for G13Button {
     }
 }
 
-#[derive(Debug)]
+impl From<G13Button> for usize {
+    fn from(b: G13Button) -> usize {
+        match b {
+            G13Button::G1 => 00,
+            G13Button::G2 => 01,
+            G13Button::G3 => 02,
+            G13Button::G4 => 03,
+            G13Button::G5 => 04,
+            G13Button::G6 => 05,
+            G13Button::G7 => 06,
+            G13Button::G8 => 07,
+            G13Button::G9 => 08,
+            G13Button::G10 => 09,
+            G13Button::G11 => 10,
+            G13Button::G12 => 11,
+            G13Button::G13 => 12,
+            G13Button::G14 => 13,
+            G13Button::G15 => 14,
+            G13Button::G16 => 15,
+            G13Button::G17 => 16,
+            G13Button::G18 => 17,
+            G13Button::G19 => 18,
+            G13Button::G20 => 19,
+            G13Button::G21 => 20,
+            G13Button::G22 => 21,
+            G13Button::UNDEF1 => 22,
+            G13Button::LIGHTSTATE => 23,
+            G13Button::BD => 24,
+            G13Button::L1 => 25,
+            G13Button::L2 => 26,
+            G13Button::L3 => 27,
+            G13Button::L4 => 28,
+            G13Button::M1 => 29,
+            G13Button::M2 => 30,
+            G13Button::M3 => 31,
+            G13Button::MR => 32,
+            G13Button::LEFT => 33,
+            G13Button::DOWN => 34,
+            G13Button::TOP => 35,
+            G13Button::UNDEF3 => 36,
+            G13Button::LIGHT => 37,
+            G13Button::LIGHT2 => 38,
+            G13Button::MISCTOGGLE => 39,
+        }
+    }
+}
+
+#[derive(Debug, Eq, PartialEq)]
 pub enum G13KeyPress {
     Pressed,
     Released
@@ -124,7 +171,7 @@ impl From<libusb::Error> for G13Error {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum G13KeyAction<T=uinput::event::keyboard::Key>
         where T: uinput::event::Press + uinput::event::Release + Copy + Clone {
     Noop,

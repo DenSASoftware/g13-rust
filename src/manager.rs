@@ -1,6 +1,7 @@
 use crate::device::G13Device;
-use crate::key::{G13Error, G13KeyPress};
+use crate::key::{G13Error, G13Button, G13KeyAction, G13KeyPress};
 use crate::constants::*;
+use crate::profile::G13KeyProfile;
 
 use std::thread;
 use std::time::Duration;
@@ -39,12 +40,30 @@ impl G13Manager {
 
         let mut uinput_device = uinput::default().unwrap().name("G13").unwrap().event(uinput::event::Keyboard::All).unwrap().create().unwrap();
         let (click_sender, click_recv) = std::sync::mpsc::channel();
+        let mut profile = G13KeyProfile::new();
 
         std::thread::spawn(move || {
-            for (_button, press_type) in click_recv.iter() {
-                match press_type {
-                    G13KeyPress::Pressed => uinput_device.press(&uinput::event::keyboard::Key::A).unwrap(),
-                    G13KeyPress::Released => uinput_device.release(&uinput::event::keyboard::Key::A).unwrap(),
+            for (button, press_type) in click_recv.iter() {
+                match button {
+                    G13Button::L1 | G13Button::L2 | G13Button::L3 => {
+                        if press_type == G13KeyPress::Released {
+                            let page = usize::from(button) - usize::from(G13Button::L1);
+
+                            profile.set_page(page);
+                        }
+                    },
+                    _ => {
+                        match profile.get_action(button) {
+                            G13KeyAction::Key(key) => {
+                                match press_type {
+                                    G13KeyPress::Pressed => uinput_device.press(key).unwrap(),
+                                    G13KeyPress::Released => uinput_device.release(key).unwrap(),
+                                }
+                                uinput_device.synchronize().unwrap();
+                            },
+                            _ => {},
+                        }
+                    }
                 }
 
                 uinput_device.synchronize().unwrap();
